@@ -13,6 +13,7 @@ import java.util.Map;
 @Configuration
 public class DirectRabbitConfig {
 
+    // 测试提交
     public static final int ALIVETIME = 600000;
     /**
      * 队列 起名：TestDirectQueue.
