@@ -1,0 +1,63 @@
+server:
+  port: 8080
+spring:
+  #给项目来个名字
+  application:
+    name: SpringBootDemo
+  #配置rabbitMq 服务器
+  rabbitmq:
+    host: 192.168.1.121
+    port: 5673
+    username: mosquitto
+    password: wyFS200177
+    #虚拟host 可以不设置,使用server默认host
+    # virtual-host: JCcccHost
+
+    #确认消息已发送到交换机(Exchange)
+    #三种模式
+    #SIMPLE(经测试有两种效果，其一效果和CORRELATED值一样会触发回调方法，其二在发布消息成功后使用rabbitTemplate调用waitForConfirms或waitForConfirmsOrDie方法等待broker节点返回发送结果，根据返回结果来判定下一步的逻辑，要注意的点是waitForConfirmsOrDie方法如果返回false则会关闭channel，则接下来无法发送消息到broker)
+    #CORRELATED(发布消息成功到交换器后会触发回调方法)
+    #NONE(禁用发布确认模式，是默认值)
+    publisher-confirm-type: correlated
+    #确认消息已发送到队列(Queue)
+    publisher-returns: true
+
+  datasource:
+    username: root
+    password: shang1234
+    #url: jdbc:mysql://192.168.1.104:3306/gf_cj?useUnicode=true&useSSL=false&characterEncoding=utf-8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.1.104:3306/gf_cj?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      test-on-borrow: true
+      test-while-idle: true
+
+
+  thymeleaf:
+    enabled: true  #开启thymeleaf视图解析
+    encoding: utf-8  #编码
+    prefix: classpath:/templates/  #前缀
+    cache: false  #是否使用缓存
+    mode: HTML  #严格的HTML语法模式
+    suffix: .html  #后缀名
+
+mybatis:
+  config-location: classpath:config/mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+
+mqtt:
+  urls: tcp://www.robo123.cn:1883
+  username: mosquitto
+  password: wyFS200177
+  producer:
+    clientIdPrefix: doart@@@mqttProducer
+    topic: TrackRobot_Request_Control/
+  consumer:
+    clientIdPrefix: doart@@@mqttConsumer
+    topic: "TrackRobot_Notify_Heart/#,TrackRobot_Ack_Control/#,\
+    TrackRobot_Response_Parameters/#,TrackRobot_Setting_Parameters/#,\
+    TrackRobot_Response_Plans/#,TrackRobot_Ack_Plans/#,TrackRobot_Response_Alarms/#,\
+    TrackRobot_Response_RunLogs/#,TrackRobot_Response_MachineStatus/#,TrackRobot_Response_BatteryRecharges/#"
+    qos: 0,0,0,0,0,0,0,0,0,0
+    completionTimeout: 30000
+  keepAlive: 10000

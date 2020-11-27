@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>My WebSocket</title>
+</head>
+<body>
+<div style="margin:50px">
+    <div>Socket状态：<button id="connectOrCloseSocket">未连接</button></div>
+    <div>&nbsp;</div>
+    <div>发送内容：<input id="sendInput"/> <button id="sendBtn">发送</button></div>
+    <div>&nbsp;</div>
+    <div>接收内容：<input readonly id="receiverContent" /></div>
+    <div>&nbsp;</div>
+    <div><span id="errMsg" style="color:red"></span></div>
+</div>
+</body>
+<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+<script>
+    $(function() {
+        $("#connectOrCloseSocket").click(function() {
+            if (websocket!=null && websocket.readyState === 1) {
+                closeWebSocket();
+            } else {
+                var wsUrl = "ws://localhost:8080/testWebSocket";
+                webSocketLink(wsUrl);
+            }
+        });
+        $("#sendBtn").click(function(){
+            sendMessage($("#sendInput").val());
+        });
+    });
+    var websocket = null;
+    // 发送websocket消息.
+    function sendMessage(msg){
+        if (websocket==null || websocket.readyState != 1) {
+            $("#errMsg").html("请连连接webSocket！")
+        } else {
+            websocket.send(msg);
+        }
+    }
+    // 关闭webSocket链接.
+    function closeWebSocket() {
+        websocket.close();
+    }
+    // 超时后自动关闭webSocket.
+    function autoColseWebSocket() {
+        setTimeout("closeWebSocket()", 1000 * 30);
+    }
+    // 连接webSocket.
+    function webSocketLink(wsUrl) {
+        if ('WebSocket' in window) {
+            websocket = new WebSocket(wsUrl);
+        } else {
+            $("#errMsg").html("浏览器不支持webSocket");
+            return;
+        }
+        websocket.onopen = function(evt) {
+            //autoColseWebSocket();
+            $("#errMsg").html("");
+            $("#connectOrCloseSocket").html("已连接");
+        };
+        websocket.onclose = function(evt) {
+            $("#connectOrCloseSocket").html("未连接");
+        };
+        websocket.onmessage = function(evt) {
+            $("#receiverContent").val(evt.data);
+        };
+        websocket.onerror = function(evt) {
+            $("#errMsg").html(evt);
+        };
+        /*websocket.addEventListener('open', function () {
+            sendMessage("这个消息由后台接收");
+        });*/
+    }
+</script>
+</html>
